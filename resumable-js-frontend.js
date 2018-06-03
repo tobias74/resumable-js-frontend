@@ -108,8 +108,10 @@ var ResumableUploadFrontend = function(resumableUploader, config){
         config.afterFileHasBeenAdded(resumableFile);
         resumableFile.layoutIdentifier = 'layoutID-' + SparkMD5.hash('' + Math.random() + performance.now());
 
-        var newRowHtml = Mustache.render(fileTemplate, resumableFile);
-        $(config.fileListSelector).append(newRowHtml);
+        var newRowHtml = $(Mustache.render(fileTemplate, resumableFile));
+        newRowHtml.attr('id', resumableFile.layoutIdentifier);
+        
+        newRowHtml.appendTo(config.fileListSelector);
 
         updateStatusOfUploadButton();
       
@@ -134,6 +136,16 @@ var ResumableUploadFrontend = function(resumableUploader, config){
     showPauseButton();
   });
 
+
+  resumableUploader.on('fileCancel', function(file){
+    if (config.removeOnCancel === true){
+      $('#' + file.layoutIdentifier).fadeOutAndRemove(3000);
+    }
+    else {
+      setStatus(file, 'canceled');
+    }
+
+  });
   
   resumableUploader.on('fileSuccess', function(file,message){
     setStatus(file, '(completed)');
@@ -146,15 +158,16 @@ var ResumableUploadFrontend = function(resumableUploader, config){
   resumableUploader.on('fileProgress', function(file){
     setProgress(file, file.progress());
     setOverallProgress(resumableUploader.progress());
+    console.log(file);
+    console.log(file.isComplete());
   });
 
 
-  resumableUploader.on('cancel', function(){
-    $('.resumable-file-progress').html('canceled');
+  resumableUploader.on('cancel', function(file){
   });
   
   resumableUploader.on('catchAll', function(event){
-    //console.log('catch all was called ', event);
+    console.log('catch all was called ', event);
   });
   
   resumableUploader.on('progress', function(){
@@ -162,7 +175,3 @@ var ResumableUploadFrontend = function(resumableUploader, config){
   });
 
 };
-
-
-
-
