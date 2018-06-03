@@ -36,7 +36,7 @@ var ResumableUploadFrontend = function(resumableUploader, config){
     if (resumableUploader.files.filter(function(fileItem){
       return !fileItem.isComplete();
     }).length > 0){
-      console.log('length is more than 0', resumableUploader.files);
+      
       if (resumableUploader.isUploading()){
         hideUploadButton();
         showPauseButton();                
