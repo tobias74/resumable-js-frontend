@@ -158,16 +158,15 @@ var ResumableUploadFrontend = function(resumableUploader, config){
   resumableUploader.on('fileProgress', function(file){
     setProgress(file, file.progress());
     setOverallProgress(resumableUploader.progress());
-    console.log(file);
-    console.log(file.isComplete());
   });
 
 
   resumableUploader.on('cancel', function(file){
+    //$('.resumable-file-progress').html('canceled');
   });
   
   resumableUploader.on('catchAll', function(event){
-    console.log('catch all was called ', event);
+    //console.log('catch all was called ', event);
   });
   
   resumableUploader.on('progress', function(){
