@@ -5,6 +5,9 @@ var ResumableUploadFrontend = function(resumableUploader, config){
 
   var self = this;
 
+  var queue = new SimpleTaskQueue();
+  queue.run();
+
   var showButDisableUploadButton = function(){
     $(config.startUploadSelector).show();
     $(config.startUploadSelector).prop("disabled",true);
@@ -99,17 +102,20 @@ var ResumableUploadFrontend = function(resumableUploader, config){
 
 
   resumableUploader.on('fileAdded', function(resumableFile) {
+    queue.addTask(function(finishedCallback){
+      setTimeout(function(){
+        
+        config.afterFileHasBeenAdded(resumableFile);
+        resumableFile.layoutIdentifier = 'layoutID-' + SparkMD5.hash('' + Math.random() + performance.now());
 
-    config.afterFileHasBeenAdded(resumableFile);
-    resumableFile.layoutIdentifier = 'layoutID-' + SparkMD5.hash('' + Math.random() + performance.now());
-    
-    setTimeout(function(){
-      var newRowHtml = Mustache.render(fileTemplate, resumableFile);
-      $(config.fileListSelector).append(newRowHtml);
+        var newRowHtml = Mustache.render(fileTemplate, resumableFile);
+        $(config.fileListSelector).append(newRowHtml);
+
+        updateStatusOfUploadButton();
       
-      updateStatusOfUploadButton();
-      
-    },0);
+        finishedCallback();
+      },0);    
+    });
   });
 
   resumableUploader.on('pause', function(){
